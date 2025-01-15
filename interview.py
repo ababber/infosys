@@ -1,0 +1,2 @@
+def canary():
+    return True
