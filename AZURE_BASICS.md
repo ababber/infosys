@@ -1,60 +1,68 @@
 # azure basics
 
+> Azure Serverless Functions, also known as Azure Functions, are a platform-as-a-service (PaaS) offering by Microsoft Azure that enables developers to run event-driven, serverless workloads. With Azure Functions, developers can focus on writing the code to address specific problems without worrying about managing infrastructure.
+
 ## serverless functions
 
-### 1. Azure Boards
+### Key Features
 
-* Purpose: Agile project management and work tracking.
-* Features:
-  * Work item tracking for tasks, bugs, user stories, and epics.
-  * Kanban boards, Scrum boards, and backlogs to visualize and organize work.
-  * Dashboards and analytics for tracking progress and performance.
-  * Use Case: Manage and monitor team workflows, ensuring alignment with project goals.
+* Event-Driven:
+  * Azure Functions are triggered by events such as HTTP requests, messages in a queue, file uploads, database changes, and more.
+  * They integrate seamlessly with other Azure services (e.g., Azure Storage, Event Grid, Service Bus) and third-party services.
 
-### 2. Azure Repos
+* Serverless:
+  * Developers don't need to provision or manage servers. Azure handles the infrastructure, including scaling, availability, and maintenance.
+  * Pay-per-execution: Costs are based on the number of executions and resources consumed (compute time, memory).
 
-* Purpose: Source code version control.
-* Features:
-  * Supports Git and Team Foundation Version Control (TFVC).
-  * Branching and pull requests for collaborative development.
-  * Code reviews with inline comments and feedback.
-  * Integrated CI/CD pipeline support.
-  * Use Case: Version control for managing source code and collaboration among developers.
+* Scalability:
+  * Automatically scales up or down based on workload demand.
+  * Supports both consumption-based plans (auto-scaling) and dedicated plans (fixed resources).
 
-### 3. Azure Pipelines
+* Multi-Language Support:
+  * Azure Functions can be written in various programming languages, including:
+  * C#
+  * JavaScript/TypeScript
+  * Python
+  * Java
+  * PowerShell
+  * Custom handlers for other languages.
 
-* Purpose: Continuous integration and continuous delivery (CI/CD).
-* Features:
-  * Build, test, and deploy code automatically across platforms.
-  * Supports multiple languages and frameworks (e.g., .NET, Java, Python, Node.js).
-  * Integration with GitHub, Bitbucket, and other version control systems.
-  * Scalable with cloud-hosted agents or self-hosted agents.
-  * Use Case: Automating builds and deployments for faster and more reliable software delivery.
+* Integration:
+  * Deep integration with Azure ecosystem services like Cosmos DB, Logic Apps, Key Vault, and more.
+  * Support for third-party APIs via connectors.
 
-### 4. Azure Test Plans
+### Typical Use Cases
 
-* Purpose: Manual and exploratory testing.
-* Features:
-  * Manage test cases, plans, and test suites.
-  * Perform manual testing with detailed tracking.
-  * Collect and analyze feedback from exploratory testing.
-  * Integration with Azure Boards for tracking test results.
-  * Use Case: Ensure software quality by integrating testing into the development lifecycle.
+* HTTP API Endpoints:
+  * Build lightweight APIs or microservices that handle HTTP requests.
 
-### 5. Azure Artifacts
+* Data Processing:
+  * Process data in real-time or batch (e.g., analyze files uploaded to Azure Blob Storage).
 
-* Purpose: Package management and artifact sharing.
-* Features:
-  * Host and share Maven, NPM, Python, NuGet, and Universal packages.
-  * Create and maintain package feeds within an organization.
-  * Upstream sources for consuming packages from public repositories.
-  * Use Case: Manage and distribute reusable code packages securely within development teams.
+* Automation:
+  * Automate repetitive tasks such as scheduled maintenance or sending reminders.
 
-### 6. Extensions Marketplace
+* Event Handling:
+  * React to events from Azure Event Hub, Service Bus, or Event Grid.
 
-* Purpose: Enhance and customize Azure DevOps functionality.
-* Features:
-  * Access to a wide range of third-party and Microsoft-developed extensions.
-  * Integration with other tools like Slack, Jira, and Docker.
-  * Build custom extensions to address specific needs.
-  * Use Case: Extend Azure DevOps capabilities to fit unique workflows and toolchains.
+* IoT:
+  * Process telemetry data from IoT devices.
+
+### Execution Models
+
+* Consumption Plan:
+  * Fully serverless and scales automatically.
+  * Pay only for the compute resources consumed while your code runs.
+
+* Premium Plan:
+  * Offers advanced features like reserved instances, VNet integration, and longer execution timeouts.
+
+* Dedicated (App Service) Plan:
+  * Run functions on dedicated VMs in an App Service environment for consistent performance.
+
+### Benefits
+
+* Cost-Effective: Pay only for the resources used during execution.
+* Agility: Rapid development and deployment of functions.
+* Flexibility: Write code in the language of choice and integrate with a wide range of services.
+* Ease of Use: Simplifies complex workflows through triggers and bindings.
