@@ -4,6 +4,7 @@
 
 ## to do
 
+* [X] setup azure accounts
 * [X] refactor `DKNG` eda into an `INFY` eda
 * [ ] test azure serverless functions w/ `INFY` eda
 * [ ] setup ado dashboard w/ epics, features, pbis, tasks
