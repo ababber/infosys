@@ -1,0 +1,15 @@
+{
+  "name": "infosys",
+  "version": "1.0.0",
+  "description": "A repo to demo skills for a TPM role.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://ankit0065@dev.azure.com/ankit0065/infosys/_git/infosys"
+  },
+  "author": "Ankit Babber",
+  "license": "ISC"
+}

@@ -10,8 +10,9 @@
 * [X] connected personal `github` to infosys project board
 * [X] setup ado dashboard w/ widgets
 * [X] setup azure repo
-* [ ] setup an epic -> feature -> pbi -> tasks for `INFY` eda
+* [X] setup an epic -> feature -> pbi -> tasks for `INFY` eda
 * [ ] test azure serverless functions w/ `INFY` eda
+* [ ] setup pipelines and testing
 * [ ] transition python app to node app w/ postgres db
 * [ ] review `az900` requirements
 * [ ] review `dp900` requirements

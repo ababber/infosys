@@ -8,6 +8,8 @@
 * [add features and epics](https://learn.microsoft.com/en-us/azure/devops/boards/boards/kanban-epics-features-stories?view=azure-devops)
 * [define features and epics](https://learn.microsoft.com/en-us/azure/devops/boards/backlogs/define-features-epics?view=azure-devops&tabs=agile-process)
 * [add tasks](https://learn.microsoft.com/en-us/azure/devops/boards/sprints/add-tasks?view=azure-devops)
+* [change azure process](https://learn.microsoft.com/en-us/azure/devops/organizations/settings/work/change-process-basic-to-agile?view=azure-devops)
+* [create/manage inherit process](https://learn.microsoft.com/en-us/azure/devops/organizations/settings/work/manage-process?view=azure-devops#change-the-process-used-by-a-project)
 
 ## Dev Ops Overview
 
@@ -481,3 +483,11 @@
 
 * Transparency:
   * Allows stakeholders to track the detailed progress of ongoing work.
+
+## Change the process from Basic -> Agile
+
+* use the resource to navigate menu
+* Steps to manually update your work items and board settings:
+  1. Update the column to state mapping for each Team Kanban Board.
+  2. Update existing work items using the right work item types set by the target process.
+  3. Update existing work items using the correct state model in the target process.
