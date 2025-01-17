@@ -7,7 +7,9 @@
 * [X] setup azure accounts
 * [X] refactor `DKNG` eda into an `INFY` eda
 * [X] review ado, epic, feature, pbi, and tasks docs and take notes
-* [ ] setup ado dashboard
+* [X] connected personal `github` to infosys project board
+* [X] setup ado dashboard w/ widgets
+* [X] setup azure repo
 * [ ] setup an epic -> feature -> pbi -> tasks for `INFY` eda
 * [ ] test azure serverless functions w/ `INFY` eda
 * [ ] transition python app to node app w/ postgres db
