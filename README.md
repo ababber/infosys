@@ -11,7 +11,8 @@
 * [X] setup ado dashboard w/ widgets
 * [X] setup azure repo
 * [X] setup an epic -> feature -> pbi -> tasks for `INFY` eda
-* [ ] setup azure serverless function
+* [X] setup azure serverless function boilerplate
+* [X] test if correct `GET` & `POST` responses are given locally and by azure instance
 * [ ] setup testing and ci/cd pipelines for boilerplate azure serverless function
 * [ ] add `INFY` eda to serverless function
 * [ ] test azure serverless functions w/ `INFY` eda

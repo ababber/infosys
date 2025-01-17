@@ -126,3 +126,22 @@ curl -X GET "http://localhost:7071/api/<funcName>" | cat
 ```sh
 curl -X POST "http://localhost:7071/api/httpTrigger" -H "Content-Type: application/json" -d '{"name": "Ankit"}' | cat
 ```
+
+* to publish
+
+```sh
+az login
+# then follow prompts
+```
+
+```md
+0. if first time creating a function app (also easiest method)
+1. go to [azure portal](https://portal.azure.com/)
+2. select create a resource -> function app
+3. select create and walk through prompts
+4. create resource groups etc...
+```
+
+```sh
+func azure functionapp publish funcName
+```
