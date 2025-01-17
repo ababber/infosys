@@ -4,6 +4,10 @@
 
 ## serverless functions
 
+### Resources
+
+* [azure fns node.js dev guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-node?tabs=javascript%2Cwindows%2Cazure-cli&pivots=nodejs-model-v4)
+
 ### Key Features
 
 * Event-Driven:
@@ -66,3 +70,59 @@
 * Agility: Rapid development and deployment of functions.
 * Flexibility: Write code in the language of choice and integrate with a wide range of services.
 * Ease of Use: Simplifies complex workflows through triggers and bindings.
+
+### Setup
+
+* install `azure-cli`
+
+```sh
+
+```
+
+* install `azure-functions`
+
+```sh
+brew tap azure/functions
+brew install azure-functions-core-tools@4
+```
+
+* init `azure-functions`
+
+```sh
+mkdf myFuncApp
+func init
+# select runtime: node, javascript
+```
+
+* add an `HTTP trigger` function
+
+```sh
+func new
+# select template: HTTP trigger
+# name function: funcName
+# DO NOT REPLACE TEMPLATE TO ENSURE EVERYTHING WORKS!
+```
+
+* test locally
+
+```sh
+func start
+
+# if started correctly, output will have:
+
+# Functions:
+
+# funcName: [GET,POST] http://localhost:7071/api/funcName
+```
+
+* test a `GET` req
+
+```sh
+curl -X GET "http://localhost:7071/api/<funcName>" | cat
+```
+
+* test a `POST` req
+
+```sh
+curl -X POST "http://localhost:7071/api/httpTrigger" -H "Content-Type: application/json" -d '{"name": "Ankit"}' | cat
+```

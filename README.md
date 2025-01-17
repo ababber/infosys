@@ -11,8 +11,10 @@
 * [X] setup ado dashboard w/ widgets
 * [X] setup azure repo
 * [X] setup an epic -> feature -> pbi -> tasks for `INFY` eda
+* [ ] setup azure serverless function
+* [ ] setup testing and ci/cd pipelines for boilerplate azure serverless function
+* [ ] add `INFY` eda to serverless function
 * [ ] test azure serverless functions w/ `INFY` eda
-* [ ] setup pipelines and testing
 * [ ] transition python app to node app w/ postgres db
 * [ ] review `az900` requirements
 * [ ] review `dp900` requirements

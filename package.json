@@ -11,5 +11,7 @@
     "url": "https://ankit0065@dev.azure.com/ankit0065/infosys/_git/infosys"
   },
   "author": "Ankit Babber",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+  }
 }
