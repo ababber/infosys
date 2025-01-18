@@ -17,5 +17,7 @@
 * [ ] add `INFY` eda to serverless function
 * [ ] test azure serverless functions w/ `INFY` eda
 * [ ] transition python app to node app w/ postgres db
+* [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
+* [ ] setup realtime connection to `finnhub` using `socket.io`
 * [ ] review `az900` requirements
 * [ ] review `dp900` requirements
