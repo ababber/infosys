@@ -81,12 +81,15 @@ jobs:
 
     - name: Debug Publish Profile
       run: |
-        if [[ -n "${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}" ]]; then
+        if [ -v "AZURE_FUNCTIONAPP_PUBLISH_PROFILE" ]; then
           echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is set."
         else
           echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is empty or not set."
           exit 1
         fi
+      env:
+        AZURE_FUNCTIONAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
 
     # - name: 'Debug List files in repo'
     #   run: ls -R
