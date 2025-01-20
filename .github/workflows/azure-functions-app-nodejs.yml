@@ -70,9 +70,6 @@ jobs:
           exit 1
         fi
 
-    - name: 'List files in repo'
-      run: ls -R
-
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
       id: fa
@@ -81,3 +78,15 @@ jobs:
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         # Remove publish-profile to use Azure RBAC
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} 
+
+    - name: Debug Publish Profile
+      run: |
+        if [ -z "${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}" ]; then
+          echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is empty or not set."
+          exit 1
+        else
+          echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is set."
+        fi
+
+    - name: 'List files in repo'
+      run: ls -R
