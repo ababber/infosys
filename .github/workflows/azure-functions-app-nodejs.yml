@@ -55,20 +55,44 @@ jobs:
     - name: 'Install Azure Functions Core Tools'
       run: npm install -g azure-functions-core-tools@4 --unsafe-perm
 
-    - name: 'Resolve Project Dependencies Using Npm'
+    # - name: 'Resolve Project Dependencies Using Npm'
+    #   shell: bash
+    #   run: |
+    #     echo "Navigating to: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+    #     if [ -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
+    #       pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+    #       npm install
+    #       npm run build --if-present
+    #       npm run test --if-present
+    #       popd
+    #     else
+    #       echo "Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist"
+    #       exit 1
+    #     fi
+
+    - name: 'Install Dependencies'
       shell: bash
       run: |
-        echo "Navigating to: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
-        if [ -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
-          pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-          popd
-        else
-          echo "Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist"
-          exit 1
-        fi
+        echo "Installing dependencies in: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        npm install
+        popd
+
+    - name: 'Run Tests'
+      shell: bash
+      run: |
+        echo "Running tests in: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        npm run test
+        popd
+
+    - name: 'Build Application'
+      shell: bash
+      run: |
+        echo "Building application in: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        npm run build --if-present
+        popd
 
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
