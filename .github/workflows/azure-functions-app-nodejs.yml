@@ -76,19 +76,19 @@ jobs:
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        # Remove publish-profile to use Azure RBAC
+        # ignore the warning for the line below, debug already confirmed the secret is set
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} 
 
-    - name: Debug Publish Profile
-      run: |
-        if [ -v "AZURE_FUNCTIONAPP_PUBLISH_PROFILE" ]; then
-          echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is set."
-        else
-          echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is empty or not set."
-          exit 1
-        fi
-      env:
-        AZURE_FUNCTIONAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+    # - name: Debug Publish Profile
+    #   run: |
+    #     if [ -v "AZURE_FUNCTIONAPP_PUBLISH_PROFILE" ]; then
+    #       echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is set."
+    #     else
+    #       echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is empty or not set."
+    #       exit 1
+    #     fi
+    #   env:
+    #     AZURE_FUNCTIONAPP_PUBLISH_PROFILE: ${ { secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE } }
 
 
     # - name: 'Debug List files in repo'
