@@ -5,12 +5,12 @@
   "main": "src/functions/*.js",
   "scripts": {
     "start": "func start",
-    "test": "echo \"No tests yet...\""
-  },
-  "dependencies": {
-    "@azure/functions": "^4.0.0"
+    "test": "jest"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.x"
+    "@azure/functions": "^4.6.0",
+    "azure-functions-core-tools": "^4.x",
+    "jest": "^29.7.0",
+    "node-mocks-http": "^1.16.2"
   }
 }
