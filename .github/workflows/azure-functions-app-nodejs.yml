@@ -88,5 +88,5 @@ jobs:
           echo "AZURE_FUNCTIONAPP_PUBLISH_PROFILE is set."
         fi
 
-    - name: 'List files in repo'
-      run: ls -R
+    # - name: 'Debug List files in repo'
+    #   run: ls -R
