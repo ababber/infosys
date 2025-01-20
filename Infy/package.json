@@ -5,7 +5,8 @@
   "main": "src/functions/*.js",
   "scripts": {
     "start": "func start",
-    "test": "jest"
+    "test": "jest",
+    "build": "echo 'no build command set'"
   },
   "devDependencies": {
     "@azure/functions": "^4.6.0",
