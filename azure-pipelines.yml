@@ -47,3 +47,12 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: 'drop'
     displayName: 'Publish artifacts'
+
+# Deploy to Azure App Service
+- task: Infy@1
+  inputs:
+    azureSubscription: 'Infy'
+    appType: 'nodejs'
+    appName: 'Infy'
+    package: '$(Build.ArtifactStagingDirectory)/app.zip'
+  displayName: 'Deploy to Azure App Service'
