@@ -48,11 +48,11 @@ steps:
       ArtifactName: 'drop'
     displayName: 'Publish artifacts'
 
-# Deploy to Azure App Service
-- task: Infy@1
-  inputs:
-    azureSubscription: 'Infy'
-    appType: 'nodejs'
-    appName: 'Infy'
-    package: '$(Build.ArtifactStagingDirectory)/app.zip'
-  displayName: 'Deploy to Azure App Service'
+  # Deploy to Azure App Service
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Infy' # Replace with your actual service connection name
+      appType: 'nodejs'
+      appName: 'Infy' # Replace with your actual app service name
+      package: '$(Build.ArtifactStagingDirectory)/app.zip'
+    displayName: 'Deploy to Azure App Service'
