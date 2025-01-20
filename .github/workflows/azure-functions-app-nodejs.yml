@@ -52,14 +52,26 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
+    - name: 'Install Azure Functions Core Tools'
+      run: npm install -g azure-functions-core-tools@4 --unsafe-perm
+
     - name: 'Resolve Project Dependencies Using Npm'
       shell: bash
       run: |
-        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        npm install
-        npm run build --if-present
-        npm run test --if-present
-        popd
+        echo "Navigating to: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+        if [ -d "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" ]; then
+          pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+          popd
+        else
+          echo "Directory ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} does not exist"
+          exit 1
+        fi
+
+    - name: 'List files in repo'
+      run: ls -R
 
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
