@@ -8,14 +8,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  NODE_VERSION: '18.x' # Specify your desired Node.js version
+  NODE_VERSION: '20.x' # Specify your desired Node.js version
 
 steps:
-  # Install Node.js
-  - task: UseNode@2
+  - task: NodeTool@0
     inputs:
       versionSpec: $(NODE_VERSION)
-    displayName: 'Use Node.js $(NODE_VERSION)'
+    displayName: 'Install Node.js $(NODE_VERSION)'
+
 
   # Install Dependencies
   - script: |
