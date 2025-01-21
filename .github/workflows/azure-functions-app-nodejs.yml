@@ -49,6 +49,16 @@ jobs:
         npm run build --if-present
         popd
 
+    - name: 'Remove WEBSITE_RUN_FROM_PACKAGE'
+      run: |
+        echo "Removing WEBSITE_RUN_FROM_PACKAGE setting from Function App"
+        az functionapp config appsettings delete \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group infosys \
+          --setting-names WEBSITE_RUN_FROM_PACKAGE
+      env:
+        AZURE_FUNCTIONAPP_NAME: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
       id: fa
@@ -56,4 +66,4 @@ jobs:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         # ignore the warning for the line below, debug already confirmed the secret is set
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} 
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
