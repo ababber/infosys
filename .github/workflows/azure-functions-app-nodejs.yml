@@ -20,6 +20,7 @@ jobs:
     - name: 'Login to Azure'
       uses: azure/login@v1
       with:
+        # ignore the warning for the line below, debug already confirmed the secret is set
         creds: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
@@ -81,3 +82,10 @@ jobs:
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         # ignore the warning for the line below, debug already confirmed the secret is set
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+    - name: 'Publish to Azure Function App'
+      run: |
+        echo "Publishing to Azure Function App instance..."
+        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }}
+      env:
+        AZURE_FUNCTIONAPP_NAME: ${{ env.AZURE_FUNCTIONAPP_NAME }}
