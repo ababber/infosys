@@ -84,8 +84,12 @@ jobs:
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
     - name: 'Publish to Azure Function App'
+      shell: bash
       run: |
         echo "Publishing to Azure Function App instance..."
+        pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}"
         func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        popd
       env:
-        AZURE_FUNCTIONAPP_NAME: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        AZURE_FUNCTIONAPP_NAME: Infy
+
