@@ -17,8 +17,12 @@
 * [X] add `INFY` eda to serverless function and return data from api call as a `GET` req
 * [X] improve performance of api calls to finnhub
 * [X] test azure serverless functions w/ `INFY` eda
-* [ ] transition python app to node app w/ postgres db
-* [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
+* [ ] add azure postgres db instance to store `INFY` data retrieived from finnhub
+* [ ] populate db with finnhub data in `INFY`
+* [ ] research whether power app or power bi is best/easy solution for data viz from db
+* [ ] add symbol look up verification from finnhub (symbol query must match at least one entry returned)
+* [ ] check if symbol exists exactly in finnhub symbol lookup, if not return `INFY`
 * [ ] setup realtime connection to `finnhub` using `socket.io`
+* [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
 * [ ] review `az900` requirements
 * [ ] review `dp900` requirements
