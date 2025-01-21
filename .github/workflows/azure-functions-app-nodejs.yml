@@ -54,6 +54,15 @@ jobs:
         npm run build --if-present
         popd
 
+    - name: 'Verify WEBSITE_RUN_FROM_PACKAGE'
+      run: |
+        echo "Checking for WEBSITE_RUN_FROM_PACKAGE setting in Function App"
+        az functionapp config appsettings list \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group infosys
+      env:
+        AZURE_FUNCTIONAPP_NAME: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+
     - name: 'Remove WEBSITE_RUN_FROM_PACKAGE'
       run: |
         echo "Removing WEBSITE_RUN_FROM_PACKAGE setting from Function App"
