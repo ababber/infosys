@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-finnhub_client = finnhub.Client(api_key="cu2rpr9r01qh0l7i0iq0cu2rpr9r01qh0l7i0iqg")
+finnhub_client = finnhub.Client(api_key="")
 
 
 sns.set_style("whitegrid")

@@ -14,8 +14,9 @@
 * [X] setup azure serverless function boilerplate
 * [X] test if correct `GET` & `POST` responses are given locally and by azure instance
 * [X] setup testing and ci/cd pipelines for boilerplate azure serverless function
-* [ ] add `INFY` eda to serverless function
-* [ ] test azure serverless functions w/ `INFY` eda
+* [X] add `INFY` eda to serverless function and return data from api call as a `GET` req
+* [X] improve performance of api calls to finnhub
+* [X] test azure serverless functions w/ `INFY` eda
 * [ ] transition python app to node app w/ postgres db
 * [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
 * [ ] setup realtime connection to `finnhub` using `socket.io`
