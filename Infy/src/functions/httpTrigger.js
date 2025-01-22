@@ -5,6 +5,7 @@ const axios = require('axios');
 const profile = require('./companyProfileSql');
 const insider = require('./insiderTransactionSql');
 const recommend = require('./recommendDataSql');
+const earn = require('./earnSurpriseSql');
 
 // Read environment variables
 const finnHubApiKey = process.env.FINNHUB_API_KEY;
@@ -64,16 +65,18 @@ const httpTrigger = async (request, context) => {
         await client.query(profile.createTable);
         await client.query(insider.createTable);
         await client.query(recommend.createTable);
+        await client.query(earn.createTable);
 
         // Fetch data from Finnhub
         const companyProfile = await fetchFinnhubData('stock/profile2', { symbol });
         const insiderTransactions = await fetchFinnhubData('stock/insider-transactions', { symbol });
         const recommendationTrends = await fetchFinnhubData('stock/recommendation', { symbol });
-        // const basicFin = await fetchFinnhubData('stock/metric', { symbol, metric: 'all' });
-        // const earnSuprise = await fetchFinnhubData('stock/earnings', { symbol, limit: 4 });
+        const earningSurprise = await fetchFinnhubData('stock/earnings', { symbol, limit: 4 });
 
-        // Make sure the `ipo` field is in YYYY-MM-DD format to store as DATE
-        // For example, `companyProfile.ipo` = '1991-03-11'
+        // @TODO: get time series data from finnhub and write to db
+        // const basicFinancial = await fetchFinnhubData('stock/metric', { symbol, metric: 'all' });
+
+        // Make sure the date field is in YYYY-MM-DD format to store as DATE
         if (companyProfile && companyProfile.ipo) {
             const companyInsertValue = profile.setCompanyInsertValues(symbol, companyProfile);
             const insertResult = await client.query(profile.insertQuery, companyInsertValue);
@@ -92,13 +95,19 @@ const httpTrigger = async (request, context) => {
           context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
         }
 
+        if (earningSurprise && Array.isArray(earningSurprise) && earningSurprise.length > 0) {
+          const { insertQuery, allValues } = earn.insertQueryAndValues(earningSurprise);
+          const insertResult = await client.query(insertQuery, allValues);
+          context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
+        }
+
         const combinedData = {
             symbol,
             companyProfile: companyProfile,
             insiderTransactions: insiderTransactions,
             recommendationTrends: recommendationTrends,
+            earningSurprises: earningSurprise,
             // basicFinancials: basicFin,
-            // earningSurprises: earnSuprise,
         };
 
         const serializedData = JSON.stringify(combinedData);
@@ -111,6 +120,7 @@ const httpTrigger = async (request, context) => {
             },
         };
     } catch (error) {
+        // console.error(error)
         context.log(`Error fetching data or connecting to DB: ${error.message}`);
         context.log('Error stack:', error.stack); // Add detailed error logging
         return {
