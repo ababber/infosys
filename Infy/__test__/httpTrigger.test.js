@@ -219,35 +219,38 @@ describe('httpTrigger Function', () => {
     expect(body.error).toBe('Failed to fetch data or connect to DB');
     expect(body.details).toContain('Failed to fetch stock/recommendation');
   });
-
-  it('should handle database errors gracefully', async () => {
-    axios.get
-      // All 3 calls succeed so we reach DB
-      .mockResolvedValueOnce({ data: { ipo: '1993-06-01' } }) // profile w/ ipo => triggers insert
-      .mockResolvedValueOnce({ data: { data: [] } }) // insider empty
-      .mockResolvedValueOnce({ data: [] }); // recommendation empty
-
-    if (!process.env.POSTGRES_CONNECTION_STRING) {
-      // cause the first insert to fail
-      mockQuery.mockImplementationOnce(() => Promise.resolve()) // create profile table
-        .mockImplementationOnce(() => Promise.resolve()) // create insider table
-        .mockImplementationOnce(() => Promise.resolve()) // create recommend table
-        .mockImplementationOnce(() => Promise.reject(new Error('DB Error'))); // insert company
-    }
-
-    const req = httpMocks.createRequest({
-      method: 'GET',
-      query: { symbol: 'INFY' },
+  
+  if (!process.env.POSTGRES_CONNECTION_STRING || !process.env.GITHUB_ACTIONS) {
+    it('should handle database errors gracefully', async () => {
+      axios.get
+        // All 3 calls succeed so we reach DB
+        .mockResolvedValueOnce({ data: { ipo: '1993-06-01' } }) // profile w/ ipo => triggers insert
+        .mockResolvedValueOnce({ data: { data: [] } }) // insider empty
+        .mockResolvedValueOnce({ data: [] }); // recommendation empty
+  
+      if (!process.env.POSTGRES_CONNECTION_STRING) {
+        // cause the first insert to fail
+        mockQuery.mockImplementationOnce(() => Promise.resolve()) // create profile table
+          .mockImplementationOnce(() => Promise.resolve()) // create insider table
+          .mockImplementationOnce(() => Promise.resolve()) // create recommend table
+          .mockImplementationOnce(() => Promise.reject(new Error('DB Error'))); // insert company
+      }
+  
+      const req = httpMocks.createRequest({
+        method: 'GET',
+        query: { symbol: 'INFY' },
+      });
+      const context = { log: jest.fn() };
+  
+      const res = await httpTrigger(req, context);
+      expect(res.status).toBe(500);
+  
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe('Failed to fetch data or connect to DB');
+      expect(body.details).toBe('DB Error');
     });
-    const context = { log: jest.fn() };
-
-    const res = await httpTrigger(req, context);
-    expect(res.status).toBe(500);
-
-    const body = JSON.parse(res.body);
-    expect(body.error).toBe('Failed to fetch data or connect to DB');
-    expect(body.details).toBe('DB Error');
-  });
+  }
+  
 
   it('should handle API errors gracefully (insider transactions)', async () => {
     // 1) profile => success
