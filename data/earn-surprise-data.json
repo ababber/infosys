@@ -1,0 +1,42 @@
+[
+  {
+    "actual": 15.68,
+    "estimate": 16.6746,
+    "period": "2024-09-30",
+    "quarter": 2,
+    "surprise": -0.9946,
+    "surprisePercent": -5.9648,
+    "symbol": "INFY.NS",
+    "year": 2025
+  },
+  {
+    "actual": 15.35,
+    "estimate": 15.3656,
+    "period": "2024-06-30",
+    "quarter": 1,
+    "surprise": -0.0156,
+    "surprisePercent": -0.1015,
+    "symbol": "INFY.NS",
+    "year": 2025
+  },
+  {
+    "actual": 19.22,
+    "estimate": 15.2624,
+    "period": "2024-03-31",
+    "quarter": 4,
+    "surprise": 3.9576,
+    "surprisePercent": 25.9304,
+    "symbol": "INFY.NS",
+    "year": 2024
+  },
+  {
+    "actual": 14.74,
+    "estimate": 15.1599,
+    "period": "2023-12-31",
+    "quarter": 3,
+    "surprise": -0.4199,
+    "surprisePercent": -2.7698,
+    "symbol": "INFY.NS",
+    "year": 2024
+  }
+]

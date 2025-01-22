@@ -1,0 +1,38 @@
+[
+  {
+    "buy": 20,
+    "hold": 9,
+    "period": "2025-01-01",
+    "sell": 2,
+    "strongBuy": 13,
+    "strongSell": 2,
+    "symbol": "INFY.NS"
+  },
+  {
+    "buy": 18,
+    "hold": 11,
+    "period": "2024-12-01",
+    "sell": 3,
+    "strongBuy": 13,
+    "strongSell": 2,
+    "symbol": "INFY.NS"
+  },
+  {
+    "buy": 18,
+    "hold": 11,
+    "period": "2024-11-01",
+    "sell": 3,
+    "strongBuy": 13,
+    "strongSell": 2,
+    "symbol": "INFY.NS"
+  },
+  {
+    "buy": 18,
+    "hold": 14,
+    "period": "2024-10-01",
+    "sell": 3,
+    "strongBuy": 12,
+    "strongSell": 0,
+    "symbol": "INFY.NS"
+  }
+]

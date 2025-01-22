@@ -1,20 +1,27 @@
 const { app } = require('@azure/functions');
+const { Client } = require('pg');
 const axios = require('axios');
+
+// Read environment variables
 const finnHubApiKey = process.env.FINNHUB_API_KEY;
+const connectionString = process.env.POSTGRES_CONNECTION_STRING;
 
 // Dynamically set AZURE_FUNCTIONS_ENV
 if (!process.env.AZURE_FUNCTIONS_ENV) {
-    process.env.AZURE_FUNCTIONS_ENV = process.env.WEBSITE_INSTANCE_ID || process.env.FUNCTIONS_WORKER_RUNTIME ? 'true' : 'false';
+    process.env.AZURE_FUNCTIONS_ENV = 
+        process.env.WEBSITE_INSTANCE_ID || process.env.FUNCTIONS_WORKER_RUNTIME 
+            ? 'true' 
+            : 'false';
 }
 
 // Utility to handle query and body parsing
 const getSymbolFromRequest = async (request) => {
     const isAzureEnv = process.env.AZURE_FUNCTIONS_ENV === 'true';
     if (isAzureEnv) {
-        // In Azure, query is a Map-like object with .get() method
+        // In Azure, request.query is a Map-like object
         return request.query.get('symbol') || 'INFY';
     } else {
-        // In local/test environment, query is a plain object
+        // In local/test environment, request.query is a plain object
         return request.query.symbol || 'INFY';
     }
 };
@@ -37,31 +44,80 @@ const fetchFinnhubData = async (endpoint, params) => {
 const httpTrigger = async (request, context) => {
     context.log(`Http function processed request for url "${request.url}"`);
 
-    // Get the symbol from the request query or default to 'INFY'
     const symbol = await getSymbolFromRequest(request);
+    // const symbol = 'INFY';
 
+    // Connect to PostgreSQL
+    const client = new Client({ connectionString });
     try {
-        // Fetch data from the Finnhub API
-        const profile = await fetchFinnhubData('stock/profile2', { symbol });
-        const basicFin = await fetchFinnhubData('stock/metric', { symbol, metric: 'all' });
-        const insiderTrans = await fetchFinnhubData('stock/insider-transactions', { symbol });
-        const recTrends = await fetchFinnhubData('stock/recommendation', { symbol });
-        const earnSuprise = await fetchFinnhubData('stock/earnings', { symbol, limit: 4 });
+        await client.connect();
+        context.log('Connected to local PostgreSQL');
 
-        // Combine the data from the endpoints
-        const combinedData = {
-            symbol,
-            companyProfile: profile,
-            basicFinancials: basicFin,
-            insiderTransactions: insiderTrans,
-            recommendationTrends: recTrends,
-            earningSurprises: earnSuprise,
-        };
+        // Create table for company profile if it doesn't exist
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS company_profile (
+                id SERIAL PRIMARY KEY,
+                symbol TEXT,
+                country TEXT,
+                currency TEXT,
+                estimateCurrency TEXT,
+                exchange TEXT,
+                finnhubIndustry TEXT,
+                ipo DATE,
+                logo TEXT,
+                marketCapitalization NUMERIC,
+                name TEXT,
+                phone TEXT,
+                shareOutstanding NUMERIC,
+                ticker TEXT,
+                weburl TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
 
-        // Serialize combined data to a JSON string
-        const serializedData = JSON.stringify(combinedData);
+        // Fetch data from Finnhub
+        const companyProfile = await fetchFinnhubData('stock/profile2', { symbol });
 
-        // Return the serialized data
+        // Insert the *companyProfile* portion into table
+        // Make sure the `ipo` field is in YYYY-MM-DD format to store as DATE
+        // For example, `companyProfile.ipo` = '1991-03-11'
+
+        if (companyProfile && companyProfile.ipo) {
+            
+            const insertQuery = `
+                INSERT INTO company_profile
+                    (symbol, country, currency, estimateCurrency, exchange, finnhubIndustry,
+                     ipo, logo, marketCapitalization, name, phone, shareOutstanding, ticker, weburl)
+                VALUES
+                    ($1, $2, $3, $4, $5, $6,
+                     TO_DATE($7, 'YYYY-MM-DD'), $8, $9, $10, $11, $12, $13, $14)
+                RETURNING id;
+            `;
+
+            const insertValues = [
+                symbol,
+                companyProfile.country || null,
+                companyProfile.currency || null,
+                companyProfile.estimateCurrency || null,
+                companyProfile.exchange || null,
+                companyProfile.finnhubIndustry || null,
+                companyProfile.ipo,
+                companyProfile.logo || null,
+                companyProfile.marketCapitalization || null,
+                companyProfile.name || null,
+                companyProfile.phone || null,
+                companyProfile.shareOutstanding || null,
+                companyProfile.ticker || null,
+                companyProfile.weburl || null
+            ];
+
+            const insertResult = await client.query(insertQuery, insertValues);
+            context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
+        }
+
+        // const serializedData = JSON.stringify(combinedData);
+        const serializedData = JSON.stringify(companyProfile);
+
         return {
             status: 200,
             body: serializedData,
@@ -70,14 +126,21 @@ const httpTrigger = async (request, context) => {
             },
         };
     } catch (error) {
-        context.log(`Error fetching data from Finnhub API: ${error.message}`);
+        context.log(`Error fetching data or connecting to DB: ${error.message}`);
+        context.log('Error stack:', error.stack); // Add detailed error logging
         return {
             status: 500,
-            body: JSON.stringify({ error: 'Failed to fetch data from Finnhub API', details: error.message }),
+            body: JSON.stringify({
+                error: 'Failed to fetch data or connect to DB',
+                details: error.message,
+            }),
             headers: {
                 'Content-Type': 'application/json',
             },
         };
+    } finally {
+        // Disconnect from PostgreSQL
+        await client.end();
     }
 };
 
@@ -87,5 +150,5 @@ app.http('httpTrigger', {
     handler: httpTrigger,
 });
 
-// Export the handler for testing
+// Export for testing
 module.exports = { httpTrigger };
