@@ -24,9 +24,16 @@
 * [X] populate current data in db to power bi
 * [ ] add remaining data from finnhub to db
 * [ ] visualize / process data from db in power bi
-* [ ] add symbol look up verification from finnhub (symbol query must match at least one entry returned)
-* [ ] check if symbol exists exactly in finnhub symbol lookup, if not return `INFY`
+
+## future features
+
+* [ ] [finnhub time series financial data](https://finnhub.io/docs/api/company-basic-financials)
+* [ ] get time series data from `finnhub`, clean, and write to db with `node.js`
+* [ ] process data with power bi
+* [ ] [finnhub realtime last price update](https://finnhub.io/docs/api/websocket-trades)
 * [ ] setup realtime connection to `finnhub` using `socket.io`
+* [ ] process data and write to db with `node.js`
+* [ ] process real time data with power bi from db
 * [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
 * [ ] review `az900` requirements
 * [ ] review `dp900` requirements
