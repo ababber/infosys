@@ -2,6 +2,9 @@ const { app } = require('@azure/functions');
 const { Client } = require('pg');
 const axios = require('axios');
 
+const profile = require('./companyProfileSql');
+const insider = require('./insiderTransactionSql')
+
 // Read environment variables
 const finnHubApiKey = process.env.FINNHUB_API_KEY;
 const connectionString = process.env.POSTGRES_CONNECTION_STRING;
@@ -56,70 +59,39 @@ const httpTrigger = async (request, context) => {
         await client.connect();
         context.log('Connected to local PostgreSQL');
 
-        // Create table for company profile if it doesn't exist
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS company_profile (
-                id SERIAL PRIMARY KEY,
-                symbol TEXT,
-                country TEXT,
-                currency TEXT,
-                estimateCurrency TEXT,
-                exchange TEXT,
-                finnhubIndustry TEXT,
-                ipo DATE,
-                logo TEXT,
-                marketCapitalization NUMERIC,
-                name TEXT,
-                phone TEXT,
-                shareOutstanding NUMERIC,
-                ticker TEXT,
-                weburl TEXT,
-                created_at TIMESTAMP DEFAULT NOW()
-            );
-        `);
+        // Create table if it doesn't exist
+        await client.query(profile.createTable);
+        await client.query(insider.createTable);
 
         // Fetch data from Finnhub
         const companyProfile = await fetchFinnhubData('stock/profile2', { symbol });
+        const insiderTransactions = await fetchFinnhubData('stock/insider-transactions', { symbol });
 
-        // Insert the *companyProfile* portion into table
         // Make sure the `ipo` field is in YYYY-MM-DD format to store as DATE
         // For example, `companyProfile.ipo` = '1991-03-11'
-
         if (companyProfile && companyProfile.ipo) {
-            
-            const insertQuery = `
-                INSERT INTO company_profile
-                    (symbol, country, currency, estimateCurrency, exchange, finnhubIndustry,
-                     ipo, logo, marketCapitalization, name, phone, shareOutstanding, ticker, weburl)
-                VALUES
-                    ($1, $2, $3, $4, $5, $6,
-                     TO_DATE($7, 'YYYY-MM-DD'), $8, $9, $10, $11, $12, $13, $14)
-                RETURNING id;
-            `;
+            const companyInsertValue = profile.setCompanyInsertValues(symbol, companyProfile);
 
-            const insertValues = [
-                symbol,
-                companyProfile.country || null,
-                companyProfile.currency || null,
-                companyProfile.estimateCurrency || null,
-                companyProfile.exchange || null,
-                companyProfile.finnhubIndustry || null,
-                companyProfile.ipo,
-                companyProfile.logo || null,
-                companyProfile.marketCapitalization || null,
-                companyProfile.name || null,
-                companyProfile.phone || null,
-                companyProfile.shareOutstanding || null,
-                companyProfile.ticker || null,
-                companyProfile.weburl || null
-            ];
-
-            const insertResult = await client.query(insertQuery, insertValues);
+            const insertResult = await client.query(profile.insertQuery, companyInsertValue);
             context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
         }
 
-        // const serializedData = JSON.stringify(combinedData);
-        const serializedData = JSON.stringify(companyProfile);
+        if (insiderTransactions && Array.isArray(insiderTransactions.data) && insiderTransactions.data.length > 0) {
+          const { insertQuery, allValues } = insider.insertQueryAndValues(insiderTransactions.data);
+          const insertResult = await client.query(insertQuery, allValues);
+          context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
+        }
+
+        const combinedData = {
+            symbol,
+            companyProfile: companyProfile,
+            insiderTransactions: insiderTransactions,
+            // basicFinancials: basicFin,
+            // recommendationTrends: recTrends,
+            // earningSurprises: earnSuprise,
+        };
+
+        const serializedData = JSON.stringify(combinedData);
 
         return {
             status: 200,
