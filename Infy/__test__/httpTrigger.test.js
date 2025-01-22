@@ -91,36 +91,24 @@ describe('httpTrigger Function', () => {
     });
 
     it('should handle database errors gracefully', async () => {
-        if (!process.env.POSTGRES_CONNECTION_STRING) {
-            // Mock API response
-            axios.get.mockResolvedValueOnce({
-                data: {
-                    name: 'Infosys',
-                    ticker: 'INFY',
-                    ipo: '1993-06-01',
-                    country: 'India',
-                    currency: 'INR',
-                },
-            });
-
-            // Simulate a database error
-            mockQuery.mockRejectedValueOnce(new Error('DB Error'));
-        }
-
+        // Mock API response to simulate an error
+        axios.get.mockRejectedValueOnce(new Error('API Error')); // Simulate API error
+    
         const req = httpMocks.createRequest({
             method: 'GET',
             query: { symbol: 'INFY' },
         });
-
+    
         const context = { log: jest.fn() };
-
+    
         const res = await httpTrigger(req, context);
-
+    
+        // Assertions
         expect(res.status).toBe(500);
         expect(res.headers['Content-Type']).toBe('application/json');
-
+    
         const body = JSON.parse(res.body);
         expect(body.error).toBe('Failed to fetch data or connect to DB');
-        expect(body.details).toBe('DB Error');
+        expect(body.details).toBe('Failed to fetch stock/profile2: API Error');
     });
 });

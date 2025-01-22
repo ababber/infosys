@@ -35,6 +35,9 @@ const fetchFinnhubData = async (endpoint, params) => {
                 token: finnHubApiKey,
             },
         });
+        if (!response || !response.data) {
+            throw new Error('Invalid API response');
+        }
         return response.data;
     } catch (error) {
         throw new Error(`Failed to fetch ${endpoint}: ${error.message}`);
