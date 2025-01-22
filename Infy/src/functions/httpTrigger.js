@@ -120,7 +120,8 @@ const httpTrigger = async (request, context) => {
             },
         };
     } catch (error) {
-        // console.error(error)
+        // @TODO: fix errors that are logged when tests run
+        console.error(error)
         context.log(`Error fetching data or connecting to DB: ${error.message}`);
         context.log('Error stack:', error.stack); // Add detailed error logging
         return {

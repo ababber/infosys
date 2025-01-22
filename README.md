@@ -22,7 +22,7 @@
 * [X] research whether power app or power bi is best/easy solution for data viz from db
 * [X] create db connection with power bi
 * [X] populate current data in db to power bi
-* [ ] add remaining data from finnhub to db
+* [X] add remaining data from finnhub to db
 * [ ] visualize / process data from db in power bi
 
 ## future features
