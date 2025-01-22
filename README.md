@@ -19,8 +19,11 @@
 * [X] test azure serverless functions w/ `INFY` eda
 * [X] add azure postgres db instance to store `INFY` data retrieived from finnhub
 * [X] populate db with finnhub data in `INFY`
-* [ ] research whether power app or power bi is best/easy solution for data viz from db
-* [ ] populate current data in db to power bi
+* [X] research whether power app or power bi is best/easy solution for data viz from db
+* [X] create db connection with power bi
+* [X] populate current data in db to power bi
+* [ ] add remaining data from finnhub to db
+* [ ] visualize / process data from db in power bi
 * [ ] add symbol look up verification from finnhub (symbol query must match at least one entry returned)
 * [ ] check if symbol exists exactly in finnhub symbol lookup, if not return `INFY`
 * [ ] setup realtime connection to `finnhub` using `socket.io`
