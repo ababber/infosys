@@ -1,14 +1,13 @@
 const createTable = `
-  CREATE TABLE IF NOT EXISTS insider_transactions (
+  CREATE TABLE IF NOT EXISTS recommend_data (
     id SERIAL PRIMARY KEY,
-    change INT,
-    currency TEXT,
-    filingDate DATE,
-    name TEXT,
-    share INT,
-    symbol TEXT,
-    transactionDate DATE,
-    transactionPrice NUMERIC
+    buy INT,
+    hold INT,
+    period DATE,
+    sell INT,
+    strongBuy INT,
+    strongSell INT,
+    symbol TEXT
   );
 `;
 
@@ -18,15 +17,14 @@ const insertQueryAndValues = (data) => {
   }
 
   const columns = [
-      'change', 
-      'currency', 
-      'filingDate', 
-      'name', 
-      'share', 
-      'symbol', 
-      'transactionDate', 
-      'transactionPrice',
-  ];
+    'buy',
+    'hold',
+    'period',
+    'sell',
+    'strongBuy',
+    'strongSell',
+    'symbol' 
+];
 
   let i = 1;
   const valueRows = [];
@@ -43,7 +41,7 @@ const insertQueryAndValues = (data) => {
   }
 
   const insertQuery =`
-    INSERT INTO insider_transactions (${columns.join(', ')})
+    INSERT INTO recommend_data (${columns.join(', ')})
     VALUES ${valueRows.join(', ')}
     RETURNING id
   `;

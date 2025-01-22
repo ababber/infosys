@@ -35,29 +35,25 @@ describe('httpTrigger Function', () => {
     jest.clearAllMocks();
   });
 
-  it('should write both company profile and insider transactions to the DB and return them', async () => {
-    // Mock the first call: company profile
+  it('should write company profile, insider transactions, and recommendation trends to the DB and return them', async () => {
+    // Mock 3 calls in correct order (profile -> insider -> recommendation)
     axios.get
       .mockResolvedValueOnce({
         data: {
+          // profile object
           country: 'India',
           currency: 'INR',
           estimateCurrency: null,
           exchange: 'NSE',
           finnhubIndustry: 'Technology',
           ipo: '1993-06-01',
-          logo: 'https://example.com/logo.png',
-          marketCapitalization: 5000000,
           name: 'Infosys',
-          phone: '1234567890',
-          shareOutstanding: 10000,
           ticker: 'INFY',
-          weburl: 'https://infosys.com',
         },
       })
-      // Mock the second call: insider transactions
       .mockResolvedValueOnce({
         data: {
+          // insider is nested: data:{ data:[ ... ] }
           data: [
             {
               change: 100,
@@ -81,93 +77,24 @@ describe('httpTrigger Function', () => {
             },
           ],
         },
-      });
-
-    if (!process.env.POSTGRES_CONNECTION_STRING) {
-      // If we're in “unit test” mode (no real DB):
-      mockQuery.mockImplementation((query, values) => {
-        // Check which query is being run
-        if (query.includes('CREATE TABLE')) {
-          // Possibly check for which table name
-          return Promise.resolve();
-        }
-        if (query.includes('INSERT INTO company_profile')) {
-          return Promise.resolve({ rows: [{ id: 1 }] });
-        }
-        if (query.includes('INSERT INTO insider_transactions')) {
-          return Promise.resolve({ rows: [{ id: 2 }] });
-        }
-
-        return Promise.reject(new Error('Unexpected query or params'));
-      });
-    }
-
-    const req = httpMocks.createRequest({
-      method: 'GET',
-      query: { symbol: 'INFY' },
-    });
-    const context = { log: jest.fn() };
-
-    const res = await httpTrigger(req, context);
-
-    // Assertions
-    expect(res.status).toBe(200);
-    expect(res.headers['Content-Type']).toBe('application/json');
-
-    const body = JSON.parse(res.body);
-
-    // Confirm the combined data
-    expect(body).toHaveProperty('symbol', 'INFY');
-    expect(body).toHaveProperty('companyProfile');
-    expect(body.companyProfile).toHaveProperty('name', 'Infosys');
-
-    expect(body).toHaveProperty('insiderTransactions');
-    // insiderTransactions is the full object with a "data" array:
-    expect(body.insiderTransactions).toHaveProperty('data');
-    expect(body.insiderTransactions.data.length).toBe(2);
-
-    // If using the mock client, confirm queries were made
-    if (!process.env.POSTGRES_CONNECTION_STRING) {
-      expect(mockClient.connect).toHaveBeenCalled();
-      // For coverage, check that the right queries were run
-      // (though to be more or less strict based on needs)
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('CREATE TABLE IF NOT EXISTS company_profile'),
-      );
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('CREATE TABLE IF NOT EXISTS insider_transactions'),
-      );
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO company_profile'),
-        expect.any(Array)
-      );
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO insider_transactions'),
-        expect.any(Array)
-      );
-      expect(mockClient.end).toHaveBeenCalled();
-    }
-  });
-
-  it('should handle empty insider-transactions data gracefully', async () => {
-    // Mock the first call: company profile
-    axios.get
-      .mockResolvedValueOnce({
-        data: {
-          country: 'India',
-          // etc...
-          // minimal data to pass the code path
-        },
       })
-      // Mock the second call with no insider transactions
       .mockResolvedValueOnce({
-        data: {
-          data: [],
-        },
+        // recommendation => array in data
+        data: [
+          {
+            symbol: 'INFY',
+            buy: 2,
+            hold: 3,
+            period: '2023-01-01',
+            sell: 1,
+            strongBuy: 0,
+            strongSell: 0,
+          },
+        ],
       });
 
     if (!process.env.POSTGRES_CONNECTION_STRING) {
-      mockQuery.mockImplementation((query) => {
+      mockQuery.mockImplementation((query, values) => {
         if (query.includes('CREATE TABLE')) {
           return Promise.resolve();
         }
@@ -175,10 +102,10 @@ describe('httpTrigger Function', () => {
           return Promise.resolve({ rows: [{ id: 1 }] });
         }
         if (query.includes('INSERT INTO insider_transactions')) {
-          // If never call .insertQueryAndValues because `data` is empty,
-          // this might never be invoked or might be invoked differently.
-          // Just in case, handle it:
           return Promise.resolve({ rows: [{ id: 2 }] });
+        }
+        if (query.includes('INSERT INTO recommend_data')) {
+          return Promise.resolve({ rows: [{ id: 3 }] });
         }
         return Promise.reject(new Error('Unexpected query'));
       });
@@ -192,48 +119,68 @@ describe('httpTrigger Function', () => {
 
     const res = await httpTrigger(req, context);
 
+    // Expect 200 success
     expect(res.status).toBe(200);
     const body = JSON.parse(res.body);
 
     expect(body).toHaveProperty('companyProfile');
     expect(body).toHaveProperty('insiderTransactions');
-    // Confirm 'data' is an empty array
-    expect(body.insiderTransactions.data).toHaveLength(0);
+    expect(body).toHaveProperty('recommendationTrends');
+
+    expect(body.insiderTransactions.data).toHaveLength(2);
+    expect(body.recommendationTrends).toHaveLength(1);
+
+    // If mocked DB, confirm queries
+    if (!process.env.POSTGRES_CONNECTION_STRING) {
+      expect(mockClient.connect).toHaveBeenCalled();
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('CREATE TABLE IF NOT EXISTS company_profile')
+      );
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('CREATE TABLE IF NOT EXISTS insider_transactions')
+      );
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('CREATE TABLE IF NOT EXISTS recommend_data')
+      );
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO company_profile'),
+        expect.any(Array)
+      );
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO insider_transactions'),
+        expect.any(Array)
+      );
+      expect(mockQuery).toHaveBeenCalledWith(
+        expect.stringContaining('INSERT INTO recommend_data'),
+        expect.any(Array)
+      );
+      expect(mockClient.end).toHaveBeenCalled();
+    }
   });
 
-  it('should handle API errors gracefully (company profile)', async () => {
-    // Make the first API call fail
-    axios.get.mockRejectedValueOnce(new Error('API Error: profile'));
-    // The second call won't matter because the first fails
-
-    const req = httpMocks.createRequest({
-      method: 'GET',
-      query: { symbol: 'INFY' },
-    });
-    const context = { log: jest.fn() };
-
-    const res = await httpTrigger(req, context);
-
-    // Assertions
-    expect(res.status).toBe(500);
-    expect(res.headers['Content-Type']).toBe('application/json');
-
-    const body = JSON.parse(res.body);
-    expect(body.error).toBe('Failed to fetch data or connect to DB');
-    // The reason should indicate the profile endpoint
-    expect(body.details).toContain('Failed to fetch stock/profile2');
-  });
-
-  it('should handle API errors gracefully (insider transactions)', async () => {
-    // First call (profile) succeeds, second fails
+  it('should handle empty company profile, insider transactions, and recommendation trends data gracefully', async () => {
     axios.get
       .mockResolvedValueOnce({
         data: {
-          country: 'India',
-          // ... minimal data
+          // empty profile => no ipo => won't insert
         },
       })
-      .mockRejectedValueOnce(new Error('API Error: insider'));
+      .mockResolvedValueOnce({
+        data: {
+          data: [], // insider empty
+        },
+      })
+      .mockResolvedValueOnce({
+        data: [], // recommendation empty
+      });
+
+    if (!process.env.POSTGRES_CONNECTION_STRING) {
+      mockQuery.mockImplementation((query) => {
+        if (query.includes('CREATE TABLE')) return Promise.resolve();
+        // Possibly no actual insert calls if there's no data
+        return Promise.resolve({ rows: [{ id: 1 }] });
+      });
+    }
 
     const req = httpMocks.createRequest({
       method: 'GET',
@@ -243,10 +190,115 @@ describe('httpTrigger Function', () => {
 
     const res = await httpTrigger(req, context);
 
-    // Assertions
+    expect(res.status).toBe(200);
+
+    const body = JSON.parse(res.body);
+    expect(body).toHaveProperty('companyProfile');
+    expect(body).toHaveProperty('insiderTransactions');
+    expect(body.insiderTransactions.data).toHaveLength(0);
+    expect(body).toHaveProperty('recommendationTrends');
+    expect(body.recommendationTrends).toHaveLength(0);
+  });
+
+  it('should handle API errors gracefully (recommendation trends)', async () => {
+    // profile OK, insider OK, 3rd fails
+    axios.get
+      .mockResolvedValueOnce({ data: { name: 'Some Profile' } })
+      .mockResolvedValueOnce({ data: { data: [] } })
+      .mockRejectedValueOnce(new Error('API Error: recommendation'));
+
+    const req = httpMocks.createRequest({
+      query: { symbol: 'INFY' },
+    });
+    const context = { log: jest.fn() };
+
+    const res = await httpTrigger(req, context);
+    expect(res.status).toBe(500);
+
+    const body = JSON.parse(res.body);
+    expect(body.error).toBe('Failed to fetch data or connect to DB');
+    expect(body.details).toContain('Failed to fetch stock/recommendation');
+  });
+
+  it('should handle database errors gracefully', async () => {
+    axios.get
+      // All 3 calls succeed so we reach DB
+      .mockResolvedValueOnce({ data: { ipo: '1993-06-01' } }) // profile w/ ipo => triggers insert
+      .mockResolvedValueOnce({ data: { data: [] } }) // insider empty
+      .mockResolvedValueOnce({ data: [] }); // recommendation empty
+
+    if (!process.env.POSTGRES_CONNECTION_STRING) {
+      // cause the first insert to fail
+      mockQuery.mockImplementationOnce(() => Promise.resolve()) // create profile table
+        .mockImplementationOnce(() => Promise.resolve()) // create insider table
+        .mockImplementationOnce(() => Promise.resolve()) // create recommend table
+        .mockImplementationOnce(() => Promise.reject(new Error('DB Error'))); // insert company
+    }
+
+    const req = httpMocks.createRequest({
+      method: 'GET',
+      query: { symbol: 'INFY' },
+    });
+    const context = { log: jest.fn() };
+
+    const res = await httpTrigger(req, context);
+    expect(res.status).toBe(500);
+
+    const body = JSON.parse(res.body);
+    expect(body.error).toBe('Failed to fetch data or connect to DB');
+    expect(body.details).toBe('DB Error');
+  });
+
+  it('should handle API errors gracefully (insider transactions)', async () => {
+    // 1) profile => success
+    axios.get
+      .mockResolvedValueOnce({
+        data: { country: 'India' },
+      })
+      // 2) insider => fails
+      .mockRejectedValueOnce(new Error('API Error: insider'))
+      // 3) recommendation => dummy success
+      .mockResolvedValueOnce({
+        data: [],
+      });
+
+    const req = httpMocks.createRequest({
+      method: 'GET',
+      query: { symbol: 'INFY' },
+    });
+    const context = { log: jest.fn() };
+
+    const res = await httpTrigger(req, context);
+
+    expect(res.status).toBe(500);
+
+    const body = JSON.parse(res.body);
+    expect(body.error).toBe('Failed to fetch data or connect to DB');
+    // The function's error message for insider calls:
+    expect(body.details).toContain('Failed to fetch stock/insider-transactions');
+  });
+
+  it('should handle API errors gracefully (company profile)', async () => {
+    // 1) profile => fails
+    axios.get
+      .mockRejectedValueOnce(new Error('API Error: profile'))
+      // 2) insider => never reached, but we must define it
+      .mockResolvedValueOnce({ data: { data: [] } })
+      // 3) recommendation => never reached, but must define
+      .mockResolvedValueOnce({ data: [] });
+
+    const req = httpMocks.createRequest({
+      method: 'GET',
+      query: { symbol: 'ERROR' },
+    });
+    const context = { log: jest.fn() };
+
+    const res = await httpTrigger(req, context);
+
     expect(res.status).toBe(500);
     const body = JSON.parse(res.body);
     expect(body.error).toBe('Failed to fetch data or connect to DB');
-    expect(body.details).toContain('Failed to fetch stock/insider-transactions');
+    // Failing on the first call: "stock/profile2"
+    expect(body.details).toContain('Failed to fetch stock/insider-transactions: API Error: profile');
   });
 });

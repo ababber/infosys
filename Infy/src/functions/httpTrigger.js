@@ -3,7 +3,8 @@ const { Client } = require('pg');
 const axios = require('axios');
 
 const profile = require('./companyProfileSql');
-const insider = require('./insiderTransactionSql')
+const insider = require('./insiderTransactionSql');
+const recommend = require('./recommendDataSql');
 
 // Read environment variables
 const finnHubApiKey = process.env.FINNHUB_API_KEY;
@@ -62,16 +63,19 @@ const httpTrigger = async (request, context) => {
         // Create table if it doesn't exist
         await client.query(profile.createTable);
         await client.query(insider.createTable);
+        await client.query(recommend.createTable);
 
         // Fetch data from Finnhub
         const companyProfile = await fetchFinnhubData('stock/profile2', { symbol });
         const insiderTransactions = await fetchFinnhubData('stock/insider-transactions', { symbol });
+        const recommendationTrends = await fetchFinnhubData('stock/recommendation', { symbol });
+        // const basicFin = await fetchFinnhubData('stock/metric', { symbol, metric: 'all' });
+        // const earnSuprise = await fetchFinnhubData('stock/earnings', { symbol, limit: 4 });
 
         // Make sure the `ipo` field is in YYYY-MM-DD format to store as DATE
         // For example, `companyProfile.ipo` = '1991-03-11'
         if (companyProfile && companyProfile.ipo) {
             const companyInsertValue = profile.setCompanyInsertValues(symbol, companyProfile);
-
             const insertResult = await client.query(profile.insertQuery, companyInsertValue);
             context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
         }
@@ -82,12 +86,18 @@ const httpTrigger = async (request, context) => {
           context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
         }
 
+        if (recommendationTrends && Array.isArray(recommendationTrends) && recommendationTrends.length > 0) {
+          const { insertQuery, allValues } = recommend.insertQueryAndValues(recommendationTrends);
+          const insertResult = await client.query(insertQuery, allValues);
+          context.log(`Inserted row ID = ${insertResult.rows[0].id}`);
+        }
+
         const combinedData = {
             symbol,
             companyProfile: companyProfile,
             insiderTransactions: insiderTransactions,
+            recommendationTrends: recommendationTrends,
             // basicFinancials: basicFin,
-            // recommendationTrends: recTrends,
             // earningSurprises: earnSuprise,
         };
 
