@@ -120,10 +120,12 @@ const httpTrigger = async (request, context) => {
             },
         };
     } catch (error) {
-        // The code below is for debgging, use when needed
-        // console.error(error)
-        // context.log(`Error fetching data or connecting to DB: ${error.message}`);
-        // context.log('Error stack:', error.stack); // Add detailed error logging
+        // The code below is for debugging and runs in production
+        if (process.env.NODE_ENV !== 'test') {
+            console.error(error);
+            context.log(`Error fetching data or connecting to DB: ${error.message}`);
+            context.log('Error stack:', error.stack);
+        }
 
         return {
             status: 500,

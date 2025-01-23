@@ -1,7 +1,3 @@
-// Suppress simulated and expected warnings and errors from tests
-jest.spyOn(console, 'warn').mockImplementation(() => {});
-jest.spyOn(console, 'error').mockImplementation(() => {});
-
 const { httpTrigger } = require('../src/functions/httpTrigger');
 const httpMocks = require('node-mocks-http');
 const axios = require('axios');
