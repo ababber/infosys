@@ -23,7 +23,7 @@
 * [X] create db connection with power bi
 * [X] populate current data in db to power bi
 * [X] add remaining data from finnhub to db
-* [ ] visualize / process data from db in power bi
+* [X] visualize / process data from db in power bi
 
 ## future features
 
