@@ -1,3 +1,7 @@
+// Suppress simulated and expected warnings and errors from tests
+jest.spyOn(console, 'warn').mockImplementation(() => {});
+jest.spyOn(console, 'error').mockImplementation(() => {});
+
 const { httpTrigger } = require('../src/functions/httpTrigger');
 const httpMocks = require('node-mocks-http');
 const axios = require('axios');
@@ -30,14 +34,17 @@ describe('httpTrigger Function', () => {
     process.env.AZURE_FUNCTIONS_ENV = 'false';
     process.env.FINNHUB_API_KEY = 'mock_api_key';
   });
+  
+  afterAll(() => {
+    jest.restoreAllMocks(); 
+    process.env.AZURE_FUNCTIONS_ENV = 'true';
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  /**
-   * Helper function to set up mock implementations for successful DB operations.
-   */
+  // Helper function to set up mock implementations for successful DB operations.
   const setupMockDBSuccess = () => {
     if (!process.env.POSTGRES_CONNECTION_STRING) {
       mockQuery.mockImplementation((query) => {
