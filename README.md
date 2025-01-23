@@ -2,9 +2,9 @@
 
 > A repo to demo skills for a TPM role.
 
-## video walkthrough
+## project walkthrough video
 
-[project walkthrough video](https://www.loom.com/share/b60995258a8b456cb432fc81ec1a167b?sid=db55e0e1-9dc2-4cec-a898-519b90a64008)
+[loom](https://www.loom.com/share/b60995258a8b456cb432fc81ec1a167b?sid=db55e0e1-9dc2-4cec-a898-519b90a64008)
 
 ## to do
 
