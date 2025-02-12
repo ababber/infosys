@@ -28,6 +28,8 @@
 * [X] populate current data in db to power bi
 * [X] add remaining data from finnhub to db
 * [X] visualize / process data from db in power bi
+* [X] review `az900` requirements
+* [X] review `dp900` requirements
 
 ## future features
 
@@ -39,5 +41,3 @@
 * [ ] process data and write to db with `node.js`
 * [ ] process real time data with power bi from db
 * [ ] [web pubsub for socket.io](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/socketio-quickstart)
-* [ ] review `az900` requirements
-* [ ] review `dp900` requirements
