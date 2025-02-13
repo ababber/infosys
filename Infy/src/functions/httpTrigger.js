@@ -145,7 +145,7 @@ const httpTrigger = async (request, context) => {
 
 app.http('httpTrigger', {
     methods: ['GET', 'POST'],
-    authLevel: 'anonymous',
+    authLevel: 'function',
     handler: httpTrigger,
 });
 
